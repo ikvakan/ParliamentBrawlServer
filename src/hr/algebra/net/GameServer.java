@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -25,8 +27,8 @@ public class GameServer extends Thread {
 
     private final ServerController serverController;
 
-    // ExecutorService pool = Executors.newFixedThreadPool(2);
-    public static LinkedList<ClientHandler> clients;
+    
+    private LinkedList<ClientHandler> clients;
 
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
@@ -36,7 +38,7 @@ public class GameServer extends Thread {
         clients = new LinkedList<>();
     }
 
-    @Override // server sluzi samo da uspostavi konekciju i salje klijenta na handler
+    @Override 
     public void run() {
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -45,22 +47,24 @@ public class GameServer extends Thread {
 
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client port: " + clientSocket.getPort());
-                
+
                 initIOStream(clientSocket);
 
                 updateServerController(clientSocket);
 
-                ClientHandler clientHandler = new ClientHandler(clientSocket,ois,oos); //proslijedim klijenta handleru
+                ClientHandler clientHandler = new ClientHandler(clientSocket, ois, oos,clients); //proslijedim klijenta handleru
                 clients.add(clientHandler);
 
                 clientHandler.start();
 
-                //pool.execute(clientHandler);
+                
             }
 
         } catch (Exception e) {
 
             e.printStackTrace();
+            
+
         }
     }
 
@@ -84,8 +88,8 @@ public class GameServer extends Thread {
     }
 
     private void initIOStream(Socket clientSocket) throws IOException {
-        oos= new ObjectOutputStream(clientSocket.getOutputStream());
-        ois= new ObjectInputStream(clientSocket.getInputStream());
+        oos = new ObjectOutputStream(clientSocket.getOutputStream());
+        ois = new ObjectInputStream(clientSocket.getInputStream());
     }
 
 }

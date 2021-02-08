@@ -23,8 +23,7 @@ public class GameStateModel implements Serializable{
     public GameStateModel() {
     }
 
-    private List<Card> playerDeck = new ArrayList<>();
-    private List<Card> opponentDeck = new ArrayList<>();
+
     private List<Card> playerHand = new ArrayList<>();
     private List<Card> opponentHand = new ArrayList<>();
 
@@ -46,21 +45,7 @@ public class GameStateModel implements Serializable{
     
 
     
-    public List<Card> getPlayerDeck() {
-        return playerDeck;
-    }
 
-    public void setPlayerDeck(List<Card> playerDeck) {
-        this.playerDeck = playerDeck;
-    }
-
-    public List<Card> getOpponentDeck() {
-        return opponentDeck;
-    }
-
-    public void setOpponentDeck(List<Card> opponentDeck) {
-        this.opponentDeck = opponentDeck;
-    }
 
     public List<Card> getPlayerHand() {
         return playerHand;
@@ -87,9 +72,7 @@ public class GameStateModel implements Serializable{
     }
 
     private void writeObject(ObjectOutputStream oos) throws IOException {
-        oos.writeObject(playerDeck);
         oos.writeObject(playerHand);
-        oos.writeObject(opponentDeck);
         oos.writeObject(opponentHand);
         oos.writeObject(fieldCards);
         oos.writeObject(players);
@@ -98,13 +81,12 @@ public class GameStateModel implements Serializable{
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 
-        
-        playerDeck = (List<Card>) ois.readObject();
         playerHand = (List<Card>) ois.readObject();
-        opponentDeck = (List<Card>) ois.readObject();
         opponentHand = (List<Card>) ois.readObject();
         fieldCards = (List<Card>) ois.readObject();
         players=(List<Player>) ois.readObject();
     
     }
+    
+
 }

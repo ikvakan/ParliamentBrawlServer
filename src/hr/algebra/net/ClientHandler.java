@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,24 +21,23 @@ import java.util.logging.Logger;
 public class ClientHandler extends Thread {
 
     private static Socket client;
-
+    private LinkedList<ClientHandler> clients;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    
-    
-    public ClientHandler(Socket client, ObjectInputStream ois, ObjectOutputStream oos) {
+
+    public ClientHandler(Socket client, ObjectInputStream ois, ObjectOutputStream oos,LinkedList<ClientHandler> clients) {
         this.client = client;
-        this.ois= ois;
-        this.oos=oos;
-       
+        this.ois = ois;
+        this.oos = oos;
+        this.clients=clients;
     }
 
     @Override
     public void run() {
-        
+
         try {
             while (true) {
-                
+
                 sendToClient();
 
             }
@@ -45,36 +45,34 @@ public class ClientHandler extends Thread {
         } catch (IOException ex) {
             try {
                 oos.close();
-                GameServer.clients.remove(this);
-                
+                clients.remove(this);
+
                 ex.printStackTrace();
-                
-            } catch (IOException ex1) {
+
+            } catch (IOException ex1 ) {
                 Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex1);
+               
+
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+            
+
+        }
 
     }
 
-    private void sendToClient() throws IOException, ClassNotFoundException {
+    private  void sendToClient() throws IOException, ClassNotFoundException {
 
-        GameStateModel gameStateModel=(GameStateModel) ois.readObject();
-        
+        GameStateModel gameStateModel = (GameStateModel) ois.readObject();
 
-        for (ClientHandler client : GameServer.clients) {
+        for (ClientHandler client : clients) {
 
             client.oos.writeObject(gameStateModel);
-
             client.oos.flush();
 
         }
 
     }
-    
-    
-    
-    
 
 }
